@@ -189,6 +189,16 @@ Khai báo vào file cấu hình /etc/fstab để khi restart server, hệ thốn
 
 `# echo "/dev/vdb1 /mnt xfs defaults 0 0"  >> /etc/fstab`
 
+**Chú ý:** 
+
+*Sau khi 1 brick đã được dùng để tạo 1 volume, mà brick đó đã được remove ra khỏi volume hoặc volume đó đã bị xóa thì brick đó không tạo được volume khác. Vì thế để có thể tận dụng lại những brick đó để tạo 1 volume khác, trước khi tạo volume ta phải làm như sau:*
+
+```
+# setfattr -x trusted.glusterfs.volume-id /mnt/brick1/
+# setfattr -x trusted.gfid /mnt/brick1/
+# rm -rf /mnt/brick1/.glusterfs
+```
+
 **Cài đặt GlusterFS:**
 
 `# apt-get install glusterfs-server`
@@ -372,15 +382,6 @@ Mount và sử dụng:
 
 `# mount -t glusterfs 10.145.37.90:/testvol /mnt`
 
-**Chú ý:** 
-
-*Sau khi 1 brick đã được dùng để tạo 1 volume, mà brick đó đã được remove ra khỏi volume hoặc volume đó đã bị xóa thì brick đó không tạo được volume khác. Vì thế để có thể tận dụng lại những brick đó để tạo 1 volume khác, trước khi tạo volume ta phải làm như sau:*
-
-```
-# setfattr -x trusted.glusterfs.volume-id /mnt/brick1/
-# setfattr -x trusted.gfid /mnt/brick1/
-# rm -rf /mnt/brick1/.glusterfs
-```
 
 <a name="Sudung"></a>
 ## II. Sử dụng GlusterFS để làm backend cho Glance trong OpenStack
@@ -429,7 +430,7 @@ Tạo thư mục "glance-volume" và mount volume "glance-volume" vào thư mụ
 
 ```
 # mkdir -p /mnt/glance-volume/glance/images/  							/// Tạo thư mục lưu trữ images
-# chown -R glance:glance /mnt/glance-volume/glance/						/// Cấp quyền sử dụng cho user glance
+# chown -R glance:glance /mnt/glance-volume/glance/images						/// Cấp quyền sử dụng cho user glance
 ```
 
 Chỉnh sửa file cấu hình của Glance
